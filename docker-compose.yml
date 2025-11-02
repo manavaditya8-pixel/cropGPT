@@ -1,0 +1,152 @@
+# CropGPT Docker Compose Configuration
+# Farmer Assistant Application with Bilingual Support
+
+version: '3.8'
+
+services:
+  # Backend FastAPI Application
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cropgpt_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://cropgpt_user:${DB_PASSWORD}@db:5432/cropgpt
+      - REDIS_URL=redis://redis:6379
+      - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY}
+      - AGMARKNET_API_KEY=${AGMARKNET_API_KEY}
+      - DIGITAL_INDIA_API_KEY=${DIGITAL_INDIA_API_KEY}
+      - HUGGINGFACE_TOKEN=${HUGGINGFACE_TOKEN}
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=${DEBUG:-false}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - ./backend:/app
+      - backend_models:/app/models
+      - backend_logs:/app/logs
+      - backend_uploads:/app/uploads
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+    networks:
+      - cropgpt_network
+
+  # Frontend Nginx Server
+  frontend:
+    image: nginx:alpine
+    container_name: cropgpt_frontend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./docker/ssl:/etc/nginx/ssl
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - cropgpt_network
+
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: cropgpt_db
+    environment:
+      - POSTGRES_DB=cropgpt
+      - POSTGRES_USER=cropgpt_user
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/migrations:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - cropgpt_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cropgpt_user -d cropgpt"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: cropgpt_redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    networks:
+      - cropgpt_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # pgAdmin (Database Management - Optional)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: cropgpt_pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      - cropgpt_network
+    profiles:
+      - admin
+
+  # Redis Commander (Redis Management - Optional)
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: cropgpt_redis_commander
+    environment:
+      - REDIS_HOSTS=local:redis:6379:0:${REDIS_PASSWORD}
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - cropgpt_network
+    profiles:
+      - admin
+
+# Volumes
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  backend_models:
+    driver: local
+  backend_logs:
+    driver: local
+  backend_uploads:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+# Networks
+networks:
+  cropgpt_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
