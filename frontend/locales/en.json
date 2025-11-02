@@ -1,0 +1,141 @@
+{
+  "app": {
+    "title": "CropGPT - Farmer Assistant",
+    "description": "Bilingual agricultural assistant for farmers in Jharkhand",
+    "name": "CropGPT",
+    "tagline": "Your farming assistant"
+  },
+  "loading": {
+    "title": "Loading CropGPT...",
+    "subtitle": "Preparing your farming assistant"
+  },
+  "nav": {
+    "home": "Home",
+    "chat": "Chat",
+    "prices": "Prices",
+    "weather": "Weather",
+    "schemes": "Schemes",
+    "about": "About"
+  },
+  "home": {
+    "welcome": "Welcome to CropGPT",
+    "subtitle": "Your bilingual farming assistant providing real-time crop prices, weather forecasts, and government scheme information"
+  },
+  "stats": {
+    "chats": "AI Conversations",
+    "prices": "Crop Prices Updated",
+    "weather": "Current Weather",
+    "schemes": "Active Schemes"
+  },
+  "features": {
+    "chat": {
+      "title": "AI Assistant",
+      "description": "Get agricultural advice in Hindi and English"
+    },
+    "prices": {
+      "title": "Crop Prices",
+      "description": "Daily market prices from Jharkhand mandis"
+    },
+    "weather": {
+      "title": "Weather Forecast",
+      "description": "7-day agricultural weather insights"
+    },
+    "schemes": {
+      "title": "Government Schemes",
+      "description": "Farmer welfare schemes and benefits"
+    }
+  },
+  "chat": {
+    "title": "AI Farming Assistant",
+    "coming_soon": "Chat interface coming soon...",
+    "input_placeholder": "Ask about farming, crops, weather, or schemes...",
+    "send": "Send",
+    "typing": "AI Assistant is typing...",
+    "error": "Failed to get response. Please try again.",
+    "quick_questions": {
+      "title": "Quick Questions",
+      "disease": "How to treat crop diseases?",
+      "fertilizer": "Which fertilizer to use?",
+      "weather": "Today's farming weather?",
+      "schemes": "Available government schemes?"
+    }
+  },
+  "prices": {
+    "title": "Crop Prices Dashboard",
+    "coming_soon": "Price dashboard coming soon...",
+    "select_market": "Select Market",
+    "select_commodity": "Select Commodity",
+    "current_prices": "Current Prices",
+    "price_trends": "Price Trends",
+    "min_price": "Min Price",
+    "max_price": "Max Price",
+    "modal_price": "Modal Price",
+    "last_updated": "Last Updated"
+  },
+  "weather": {
+    "title": "Weather Forecast",
+    "coming_soon": "Weather dashboard coming soon...",
+    "current_weather": "Current Weather",
+    "forecast_7day": "7-Day Forecast",
+    "temperature": "Temperature",
+    "humidity": "Humidity",
+    "rainfall": "Rainfall",
+    "wind_speed": "Wind Speed",
+    "conditions": "Conditions",
+    "farming_advice": "Farming Advice"
+  },
+  "schemes": {
+    "title": "Government Schemes",
+    "coming_soon": "Schemes portal coming soon...",
+    "all_schemes": "All Schemes",
+    "eligible_schemes": "Eligible Schemes",
+    "search_schemes": "Search Schemes...",
+    "filter_category": "Filter by Category",
+    "apply_now": "Apply Now",
+    "deadline": "Deadline",
+    "benefits": "Benefits",
+    "eligibility": "Eligibility"
+  },
+  "about": {
+    "title": "About CropGPT",
+    "coming_soon": "About page coming soon...",
+    "mission": "Our Mission",
+    "vision": "Our Vision",
+    "team": "Our Team",
+    "contact": "Contact Us"
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "made_with": "Made with ❤️ for Jharkhand farmers"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "close": "Close",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "view_more": "View More",
+    "view_less": "View Less",
+    "next": "Next",
+    "previous": "Previous",
+    "page": "Page",
+    "of": "of",
+    "results": "results"
+  },
+  "errors": {
+    "network": "Network error. Please check your connection.",
+    "server": "Server error. Please try again later.",
+    "not_found": "Page not found.",
+    "validation": "Please check your input and try again.",
+    "unauthorized": "You are not authorized to access this resource.",
+    "forbidden": "Access denied.",
+    "timeout": "Request timeout. Please try again."
+  }
+}
