@@ -218,13 +218,175 @@
             </div>
         </section>
 
-        <!-- Placeholder sections for other pages -->
+        <!-- Chat Section -->
         <section id="chat" class="section hidden min-h-screen py-12">
             <div class="container mx-auto px-4">
                 <h2 class="text-3xl font-bold text-center mb-8" data-i18n="chat.title">AI Farming Assistant</h2>
+
+                <!-- Speech Compatibility Warning -->
+                <div id="speech-warning" class="hidden max-w-4xl mx-auto mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-triangle text-yellow-600 mr-3"></i>
+                        <div>
+                            <h3 class="text-yellow-800 font-semibold">Speech Features Limited</h3>
+                            <p class="text-yellow-700 text-sm">Your browser may have limited speech support. For the best experience, please use Chrome or Edge.</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="max-w-4xl mx-auto">
-                    <div class="bg-white rounded-lg shadow-lg p-6">
-                        <p data-i18n="chat.coming_soon">Chat interface coming soon...</p>
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                        <!-- Chat Header -->
+                        <div class="bg-gradient-to-r from-green-600 to-blue-600 text-white p-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-robot text-white text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold">CropGPT Assistant</h3>
+                                        <p class="text-sm opacity-90">Ask me anything about farming</p>
+                                    </div>
+                                </div>
+                                <!-- Voice Status Indicator -->
+                                <div id="voice-status" class="flex items-center space-x-2">
+                                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                                    <span class="text-sm">Ready</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chat Messages -->
+                        <div id="chat-messages" class="chat-messages h-96 overflow-y-auto p-4 space-y-4 bg-gray-50">
+                            <!-- Welcome Message -->
+                            <div class="flex items-start space-x-3">
+                                <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-robot text-white text-sm"></i>
+                                </div>
+                                <div class="bg-white rounded-lg p-3 max-w-md shadow-sm">
+                                    <p class="text-gray-800">
+                                        <span data-i18n="chat.welcome_message">नमस्ते! मैं आपका कृषि सहायक हूं। मैं आपको हिंदी या अंग्रेजी में खेती, फसलों, मौसम और सरकारी योजनाओं के बारे में मदद कर सकता हूं। मैं बोलकर भी बात कर सकता हूं!</span>
+                                    </p>
+                                    <div class="mt-2">
+                                        <button class="speak-response text-blue-600 hover:text-blue-800 text-sm">
+                                            <i class="fas fa-volume-up mr-1"></i>
+                                            <span data-i18n="chat.speak_message">Listen</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Questions -->
+                        <div class="border-t border-gray-200 p-4 bg-gray-50">
+                            <p class="text-sm text-gray-600 mb-2" data-i18n="chat.quick_suggestions">Quick suggestions:</p>
+                            <div class="flex flex-wrap gap-2">
+                                <button class="quick-question px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm hover:bg-blue-200 transition-colors"
+                                        data-question="What is the best fertilizer for paddy?" data-lang="en">
+                                    <i class="fas fa-seedling mr-1"></i>Paddy Fertilizer
+                                </button>
+                                <button class="quick-question px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm hover:bg-green-200 transition-colors"
+                                        data-question="धान की फसल के लिए सबसे अच्छा उर्वरक क्या है?" data-lang="hi">
+                                    <i class="fas fa-seedling mr-1"></i>धान उर्वरक
+                                </button>
+                                <button class="quick-question px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm hover:bg-orange-200 transition-colors"
+                                        data-question="How to control pests in wheat?" data-lang="en">
+                                    <i class="fas fa-bug mr-1"></i>Wheat Pests
+                                </button>
+                                <button class="quick-question px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm hover:bg-purple-200 transition-colors"
+                                        data-question="आज मौसम कैसा है?" data-lang="hi">
+                                    <i class="fas fa-cloud-sun mr-1"></i>आज का मौसम
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Chat Input -->
+                        <div class="border-t border-gray-200 p-4 bg-white">
+                            <div class="flex items-end space-x-3">
+                                <!-- Microphone Button -->
+                                <div class="relative">
+                                    <button id="mic-button"
+                                            class="mic-button w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500">
+                                        <i class="fas fa-microphone text-gray-600 text-lg"></i>
+                                    </button>
+
+                                    <!-- Recording Indicator -->
+                                    <div id="recording-indicator" class="hidden absolute inset-0 w-12 h-12 bg-red-500 rounded-full flex items-center justify-center animate-pulse">
+                                        <i class="fas fa-microphone-slash text-white text-lg"></i>
+                                    </div>
+
+                                    <!-- Speech Language Selector -->
+                                    <div id="speech-lang-selector" class="hidden absolute bottom-full left-0 mb-2 bg-white rounded-lg shadow-lg border border-gray-200 p-2">
+                                        <button class="speech-lang-btn block w-full text-left px-3 py-2 hover:bg-gray-100 rounded text-sm" data-lang="en">
+                                            🇬🇧 English
+                                        </button>
+                                        <button class="speech-lang-btn block w-full text-left px-3 py-2 hover:bg-gray-100 rounded text-sm" data-lang="hi">
+                                            🇮🇳 हिंदी
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Text Input -->
+                                <div class="flex-1">
+                                    <div class="relative">
+                                        <textarea id="chat-input"
+                                                rows="1"
+                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                                placeholder="Ask about farming, crops, weather, or schemes..."
+                                                data-i18n-placeholder="chat.input_placeholder"></textarea>
+
+                                        <!-- Speech Recognition Feedback -->
+                                        <div id="speech-feedback" class="hidden absolute top-full left-0 right-0 mt-1 p-2 bg-gray-100 rounded text-sm text-gray-600">
+                                            <span id="speech-text">Listening...</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Send Button -->
+                                <button id="send-button"
+                                        class="send-button w-12 h-12 bg-green-600 hover:bg-green-700 text-white rounded-full flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-green-500">
+                                    <i class="fas fa-paper-plane text-lg"></i>
+                                </button>
+
+                                <!-- Voice Settings Button -->
+                                <button id="voice-settings-btn"
+                                        class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500">
+                                    <i class="fas fa-cog text-gray-600 text-sm"></i>
+                                </button>
+                            </div>
+
+                            <!-- Voice Controls -->
+                            <div id="voice-controls" class="hidden mt-4 p-4 bg-gray-50 rounded-lg">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-4">
+                                        <label class="flex items-center space-x-2">
+                                            <input type="checkbox" id="auto-speak" class="rounded text-green-600 focus:ring-green-500">
+                                            <span class="text-sm text-gray-700" data-i18n="chat.auto_speak">Auto-speak responses</span>
+                                        </label>
+                                        <label class="flex items-center space-x-2">
+                                            <input type="checkbox" id="voice-commands" class="rounded text-green-600 focus:ring-green-500">
+                                            <span class="text-sm text-gray-700" data-i18n="chat.voice_commands">Voice commands</span>
+                                        </label>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <label class="text-sm text-gray-700" data-i18n="chat.speech_rate">Speed:</label>
+                                        <input type="range" id="speech-rate" min="0.5" max="2" step="0.1" value="1" class="w-24">
+                                        <span id="speech-rate-value" class="text-sm text-gray-600">1.0x</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Help Section -->
+                    <div class="mt-6 bg-blue-50 rounded-lg p-4">
+                        <h4 class="font-semibold text-blue-900 mb-2" data-i18n="chat.voice_help_title">Voice Controls</h4>
+                        <ul class="text-sm text-blue-800 space-y-1">
+                            <li>🎤 <span data-i18n="chat.voice_help_1">Click microphone to speak</span></li>
+                            <li>🌐 <span data-i18n="chat.voice_help_2">Works in both Hindi and English</span></li>
+                            <li>🔊 <span data-i18n="chat.voice_help_3">Click speaker icon to hear responses</span></li>
+                            <li>⚙️ <span data-i18n="chat.voice_help_4">Settings to control voice features</span></li>
+                        </ul>
                     </div>
                 </div>
             </div>
