@@ -47,11 +47,27 @@
   },
   "chat": {
     "title": "AI Farming Assistant",
-    "coming_soon": "Chat interface coming soon...",
+    "welcome_message": "Hello! I'm your farming assistant. I can help you with farming, crops, weather, and government schemes in Hindi or English. I can also talk with you!",
     "input_placeholder": "Ask about farming, crops, weather, or schemes...",
     "send": "Send",
     "typing": "AI Assistant is typing...",
     "error": "Failed to get response. Please try again.",
+    "speak_message": "Listen",
+    "quick_suggestions": "Quick suggestions:",
+    "auto_speak": "Auto-speak responses",
+    "voice_commands": "Voice commands",
+    "speech_rate": "Speed:",
+    "voice_help_title": "Voice Controls",
+    "voice_help_1": "Click microphone to speak",
+    "voice_help_2": "Works in both Hindi and English",
+    "voice_help_3": "Click speaker icon to hear responses",
+    "voice_help_4": "Settings to control voice features",
+    "voice_status": {
+      "ready": "Ready",
+      "listening": "Listening...",
+      "thinking": "Thinking...",
+      "speaking": "Speaking..."
+    },
     "quick_questions": {
       "title": "Quick Questions",
       "disease": "How to treat crop diseases?",
