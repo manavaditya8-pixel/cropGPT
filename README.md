@@ -358,7 +358,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - 🔄 Real-time price alerts
 - 📊 Advanced analytics dashboard
 - 🌾 Crop disease detection
-- 💬 Voice support in Hindi
+- ✅ Voice support in Hindi and English
+- 🎯 Enhanced voice commands and controls
 
 ### Phase 3 (Future)
 - 🤝 Multi-language support (more Indian languages)
