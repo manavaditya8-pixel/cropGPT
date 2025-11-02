@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="app.title">CropGPT - Farmer Assistant</title>
+    <meta name="description" data-i18n="app.description" content="Bilingual agricultural assistant for farmers in Jharkhand">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/main.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- i18next -->
+    <script src="https://cdn.jsdelivr.net/npm/i18next@23.7.6/i18next.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/i18next-browser-languagedetector@7.2.0/i18nextBrowserLanguageDetector.min.js"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        /* Custom Tailwind Configuration */
+        @layer base {
+            :root {
+                --font-sans: 'Noto Sans', system-ui, sans-serif;
+                --font-devanagari: 'Noto Sans Devanagari', system-ui, sans-serif;
+            }
+
+            body {
+                font-family: var(--font-sans);
+            }
+
+            [lang="hi"] {
+                font-family: var(--font-devanagari);
+            }
+        }
+
+        /* Loading Animation */
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Hide content until i18n is ready */
+        .hidden-until-i18n { display: none; }
+        .i18n-ready .hidden-until-i18n { display: block; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="fixed inset-0 bg-white flex items-center justify-center z-50">
+        <div class="text-center">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <h2 class="text-xl font-semibold text-gray-700" data-i18n="loading.title">Loading CropGPT...</h2>
+            <p class="text-gray-500 mt-2" data-i18n="loading.subtitle">Preparing your farming assistant</p>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="bg-white shadow-md sticky top-0 z-40">
+        <nav class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-seedling text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900">
+                            <span data-i18n="app.name">CropGPT</span>
+                        </h1>
+                        <p class="text-xs text-gray-600 hidden sm:block" data-i18n="app.tagline">Your farming assistant</p>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="#home" class="nav-link text-gray-700 hover:text-green-600 font-medium transition-colors" data-i18n="nav.home">Home</a>
+                    <a href="#chat" class="nav-link text-gray-700 hover:text-green-600 font-medium transition-colors" data-i18n="nav.chat">Chat</a>
+                    <a href="#prices" class="nav-link text-gray-700 hover:text-green-600 font-medium transition-colors" data-i18n="nav.prices">Prices</a>
+                    <a href="#weather" class="nav-link text-gray-700 hover:text-green-600 font-medium transition-colors" data-i18n="nav.weather">Weather</a>
+                    <a href="#schemes" class="nav-link text-gray-700 hover:text-green-600 font-medium transition-colors" data-i18n="nav.schemes">Schemes</a>
+                    <a href="#about" class="nav-link text-gray-700 hover:text-green-600 font-medium transition-colors" data-i18n="nav.about">About</a>
+                </div>
+
+                <!-- Language Toggle & Mobile Menu -->
+                <div class="flex items-center space-x-4">
+                    <!-- Language Toggle -->
+                    <div class="flex items-center bg-gray-100 rounded-lg p-1">
+                        <button id="lang-en" class="lang-toggle px-3 py-1 rounded text-sm font-medium transition-all">
+                            EN
+                        </button>
+                        <button id="lang-hi" class="lang-toggle px-3 py-1 rounded text-sm font-medium transition-all">
+                            हिं
+                        </button>
+                    </div>
+
+                    <!-- Mobile Menu Button -->
+                    <button id="mobile-menu-button" class="md:hidden p-2 rounded-lg hover:bg-gray-100">
+                        <i class="fas fa-bars text-gray-700 text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Navigation -->
+            <div id="mobile-menu" class="hidden md:hidden mt-4 pt-4 border-t border-gray-200">
+                <div class="flex flex-col space-y-3">
+                    <a href="#home" class="mobile-nav-link text-gray-700 hover:text-green-600 font-medium py-2" data-i18n="nav.home">Home</a>
+                    <a href="#chat" class="mobile-nav-link text-gray-700 hover:text-green-600 font-medium py-2" data-i18n="nav.chat">Chat</a>
+                    <a href="#prices" class="mobile-nav-link text-gray-700 hover:text-green-600 font-medium py-2" data-i18n="nav.prices">Prices</a>
+                    <a href="#weather" class="mobile-nav-link text-gray-700 hover:text-green-600 font-medium py-2" data-i18n="nav.weather">Weather</a>
+                    <a href="#schemes" class="mobile-nav-link text-gray-700 hover:text-green-600 font-medium py-2" data-i18n="nav.schemes">Schemes</a>
+                    <a href="#about" class="mobile-nav-link text-gray-700 hover:text-green-600 font-medium py-2" data-i18n="nav.about">About</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="hidden-until-i18n">
+        <!-- Home Dashboard Section -->
+        <section id="home" class="section min-h-screen py-12">
+            <div class="container mx-auto px-4">
+                <!-- Welcome Section -->
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-bold text-gray-900 mb-4">
+                        <span data-i18n="home.welcome">Welcome to CropGPT</span>
+                    </h2>
+                    <p class="text-xl text-gray-600 max-w-3xl mx-auto" data-i18n="home.subtitle">
+                        Your bilingual farming assistant providing real-time crop prices, weather forecasts, and government scheme information
+                    </p>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                    <div class="bg-white rounded-lg shadow-md p-6 text-center">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-comments text-blue-600 text-xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900" id="chat-count">0</h3>
+                        <p class="text-gray-600" data-i18n="stats.chats">AI Conversations</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 text-center">
+                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-rupee-sign text-green-600 text-xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900" id="price-count">0</h3>
+                        <p class="text-gray-600" data-i18n="stats.prices">Crop Prices Updated</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 text-center">
+                        <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-cloud-sun text-orange-600 text-xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900" id="weather-temp">--°C</h3>
+                        <p class="text-gray-600" data-i18n="stats.weather">Current Weather</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 text-center">
+                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-hand-holding-usd text-purple-600 text-xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900" id="scheme-count">0</h3>
+                        <p class="text-gray-600" data-i18n="stats.schemes">Active Schemes</p>
+                    </div>
+                </div>
+
+                <!-- Feature Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="feature-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer" data-section="chat">
+                        <div class="w-16 h-16 bg-blue-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-robot text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2" data-i18n="features.chat.title">AI Assistant</h3>
+                        <p class="text-gray-600" data-i18n="features.chat.description">Get agricultural advice in Hindi and English</p>
+                    </div>
+
+                    <div class="feature-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer" data-section="prices">
+                        <div class="w-16 h-16 bg-green-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-chart-line text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2" data-i18n="features.prices.title">Crop Prices</h3>
+                        <p class="text-gray-600" data-i18n="features.prices.description">Daily market prices from Jharkhand mandis</p>
+                    </div>
+
+                    <div class="feature-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer" data-section="weather">
+                        <div class="w-16 h-16 bg-orange-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-cloud-sun-rain text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2" data-i18n="features.weather.title">Weather Forecast</h3>
+                        <p class="text-gray-600" data-i18n="features.weather.description">7-day agricultural weather insights</p>
+                    </div>
+
+                    <div class="feature-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer" data-section="schemes">
+                        <div class="w-16 h-16 bg-purple-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-bullhorn text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2" data-i18n="features.schemes.title">Government Schemes</h3>
+                        <p class="text-gray-600" data-i18n="features.schemes.description">Farmer welfare schemes and benefits</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Placeholder sections for other pages -->
+        <section id="chat" class="section hidden min-h-screen py-12">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-8" data-i18n="chat.title">AI Farming Assistant</h2>
+                <div class="max-w-4xl mx-auto">
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <p data-i18n="chat.coming_soon">Chat interface coming soon...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="prices" class="section hidden min-h-screen py-12">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-8" data-i18n="prices.title">Crop Prices</h2>
+                <div class="max-w-6xl mx-auto">
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <p data-i18n="prices.coming_soon">Price dashboard coming soon...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="weather" class="section hidden min-h-screen py-12">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-8" data-i18n="weather.title">Weather Forecast</h2>
+                <div class="max-w-4xl mx-auto">
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <p data-i18n="weather.coming_soon">Weather dashboard coming soon...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="schemes" class="section hidden min-h-screen py-12">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-8" data-i18n="schemes.title">Government Schemes</h2>
+                <div class="max-w-6xl mx-auto">
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <p data-i18n="schemes.coming_soon">Schemes portal coming soon...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="section hidden min-h-screen py-12">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-8" data-i18n="about.title">About CropGPT</h2>
+                <div class="max-w-4xl mx-auto">
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <p data-i18n="about.coming_soon">About page coming soon...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="text-center">
+                <p>&copy; 2024 CropGPT. <span data-i18n="footer.rights">All rights reserved.</span></p>
+                <p class="text-gray-400 mt-2" data-i18n="footer.made_with">Made with ❤️ for Jharkhand farmers</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="/static/js/i18n.js"></script>
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/api.js"></script>
+</body>
+</html>
