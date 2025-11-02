@@ -6,9 +6,11 @@ A comprehensive bilingual agricultural assistant for farmers in Jharkhand, provi
 
 ### 🤖 AI Chatbot Assistant
 - **Bilingual Support**: Natural conversations in Hindi and English
+- **Voice Interaction**: Speak in Hindi or English and hear responses
 - **Fine-tuned LLM**: Agricultural knowledge using Llama-2 with QLoRA
 - **Context-Aware**: Understands farming-specific queries
 - **Quick Suggestions**: Pre-defined questions for common topics
+- **Voice Commands**: Control app with voice (clear chat, switch language, etc.)
 
 ### 💰 Crop Prices Dashboard
 - **Real-time Data**: Daily prices from Jharkhand mandis
